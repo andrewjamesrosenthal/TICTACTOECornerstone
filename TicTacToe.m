@@ -1,5 +1,16 @@
 %Tic Tac Toe
-% Tic Tac Toe
+%Tic Tac Toe
+% Pseudocode for Tic-Tac-Toe Game
+%Display ASCII art and welcome message
+%Display Rules of game
+%Enter player 1 & 2 names
+%Flip "coin" to see who goes first, if heads player 1 starts tails player 2
+%starts
+%Uses while loop that to start the game 
+%Calls board plot
+%Lets users enter locations and checkswin for win
+%Loop breaks when there is a winner
+
 clc; clear;
 disp("The Program was written by Andrew and Sean")
 % Displaying the rules of Tic-Tac-Toe
