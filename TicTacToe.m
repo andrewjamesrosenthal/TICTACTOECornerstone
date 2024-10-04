@@ -85,25 +85,59 @@ while (true)
     if w ~= 0
         break
     end
-    
-    playerInput = input("It is " + names(turn) + "'s turn, where would you like to place your piece (or type q to quit): ", 's');  
-    if playerInput == "q"
-        break
+
+    disp("It is " + names(turn) + "'s turn.");
+
+    % Get and validate row input
+    while true
+        rowInput = input("Enter the row (A, B, C) or 'q' to quit: ", 's');
+        if lower(rowInput) == "q"
+            disp("User has quit the game");
+            break;
+        elseif ismember(lower(rowInput), {'a', 'b', 'c'})
+            break;
+        else
+            disp("Invalid row input, please enter A, B, or C.");
+        end
     end
-    
-    % to be implemented: confirm that is valid spot
-    if length(playerInput) ~= 2 | playerInput(1)
-    % convert row and col to cell
-    cell = (playerInput(1)-'A')*3+str2num(playerInput(2));
+
+    if lower(rowInput) == "q"
+        break;
+    end
+
+    % Get and validate column input
+    while true
+        colInput = input("Enter the column (1, 2, 3) or 'q' to quit: ", 's');
+        if lower(colInput) == "q"
+            disp("User has quit the game");
+            break;
+        end
+
+        % Convert colInput to a number for comparison
+        colNumber = str2double(colInput);
+
+        % Check if the input is valid (a number between 1 and 3)
+        if isnan(colNumber) || ~ismember(colNumber, [1, 2, 3])
+            disp("Invalid column input, please enter 1, 2, or 3.");
+        else
+            break;
+        end
+    end
+
+    if lower(colInput) == "q"
+        break;
+    end
+
+    % Convert row and column to cell index
+    cell = (upper(rowInput) - 'A') * 3 + str2double(colInput);
 
     if ~checktaken_AS(boardArr, cell)
-        % place piece
+        % Place piece
         boardArr(cell) = turn;
-        % change turn
+        % Change turn
         turn = mod(turn, 2) + 1;
         clc;
     else
-        disp("Invalid move try again")
+        disp("Invalid move, spot already taken. Try again.");
     end
 end
-
