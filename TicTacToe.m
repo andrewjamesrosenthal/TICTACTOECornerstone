@@ -82,83 +82,103 @@ boardArr = repelem(0, 9);
 [moveSound, moveFs] = audioread('move.mp3');
 [quitSound, quitFs] = audioread('quit.mp3'); % Make sure you also load the sample rate for quitSound
 
-% Create an audioplayer object for the background music
-bgMusicPlayer = audioplayer(gMusic, gMusicFs);
-play(bgMusicPlayer);  % Play the background music (no need for 'async')
+playAgain = 'y';  % Initialize to allow playing at least one round
 
-% Main game loop
-while (true)
-    [w, s, f] = Checkwin_AS(boardArr);
-    Boardplot_AS(boardArr, w, s, f);
-    
-    if w ~= 0
-        % Play the win sound when a winner is detected
-        [y, Fs] = audioread('wins.wav'); % Read the win audio file
-        sound(y, Fs); % Play the win sound
-        disp([names(w) ' wins the game!']);
-        stop(bgMusicPlayer);  % Stop background music when the game ends
-        break
-    end
+while lower(playAgain) == 'y'  % Loop to allow replaying
 
-    disp("It is " + names(turn) + "'s turn.");
+    % Main game loop initialization
+    boardArr = repelem(0, 9);
+    turn = randi([1, 2], 1);  % Randomly decide who goes first
+    fprintf('Coin was heads! %s goes first!\n', names(turn));
+    pause(1);
+    clc;
 
-    % Get and validate row input
-    while true
-        rowInput = input("Enter the row (A, B, C) or 'q' to quit: ", 's');
-        if lower(rowInput) == "q"
-            disp("User has quit the game");
+    % Load and start background music (if applicable)
+    bgMusicPlayer = audioplayer(gMusic, gMusicFs);
+    play(bgMusicPlayer);
+
+    % Main game loop
+    while (true)
+        [w, s, f] = Checkwin_AS(boardArr);
+        Boardplot_AS(boardArr, w, s, f);
+
+        if w ~= 0
+            % Play the win sound when a winner is detected
+            [y, Fs] = audioread('wins.wav');
+            sound(y, Fs);
+            disp(names(w) + ' wins the game!');
             stop(bgMusicPlayer);
-            sound(quitSound, quitFs);  % Play the quit sound with the correct sample rate
-            break;
-        elseif ismember(lower(rowInput), {'a', 'b', 'c'})
-            break;
-        else
-            disp("Invalid row input, please enter A, B, or C.");
+            break;  % Break out of the main game loop when a player wins
         end
-    end
 
-    if lower(rowInput) == "q"
-        break;
-    end
+        disp("It is " + names(turn) + "'s turn.");
 
-    % Get and validate column input
-    while true
-        colInput = input("Enter the column (1, 2, 3) or 'q' to quit: ", 's');
+        % Get and validate row input
+        while true
+            rowInput = input("Enter the row (A, B, C) or 'q' to quit: ", 's');
+            if lower(rowInput) == "q"
+                disp("User has quit the game");
+                stop(bgMusicPlayer);
+                sound(quitSound, quitFs);
+                break;  % Exit game loop on quit
+            elseif ismember(lower(rowInput), {'a', 'b', 'c'})
+                break;
+            else
+                disp("Invalid row input, please enter A, B, or C.");
+            end
+        end
+
+        if lower(rowInput) == "q"
+            break;
+        end
+
+        % Get and validate column input
+        while true
+            colInput = input("Enter the column (1, 2, 3) or 'q' to quit: ", 's');
+            if lower(colInput) == "q"
+                disp("User has quit the game");
+                stop(bgMusicPlayer);
+                sound(quitSound, quitFs);
+                break;
+            end
+
+            colNumber = str2double(colInput);
+
+            if isnan(colNumber) || ~ismember(colNumber, [1, 2, 3])
+                disp("Invalid column input, please enter 1, 2, or 3.");
+            else
+                break;
+            end
+        end
+
         if lower(colInput) == "q"
-            disp("User has quit the game");
-            stop(bgMusicPlayer); 
-            sound(quitSound, quitFs);  % Play the quit sound with the correct sample rate
             break;
         end
 
-        % Convert colInput to a number for comparison
-        colNumber = str2double(colInput);
+        % Convert row and column to cell index
+        cell = (upper(rowInput) - 'A') * 3 + str2double(colInput);
 
-        % Check if the input is valid (a number between 1 and 3)
-        if isnan(colNumber) || ~ismember(colNumber, [1, 2, 3])
-            disp("Invalid column input, please enter 1, 2, or 3.");
+        if ~checktaken_AS(boardArr, cell)
+            sound(moveSound, moveFs);  % Play move sound
+            boardArr(cell) = turn;  % Place piece
+            turn = mod(turn, 2) + 1;  % Switch player
+            clc;
         else
-            break;
+            disp("Invalid move, spot already taken. Try again.");
         end
     end
 
-    if lower(colInput) == "q"
-        break;
+    % After game ends (either via win or quit)
+    disp("Game over! Thanks for playing.");
+
+    % Ask if the players want to play another round
+    playAgain = input("Do you want to play another round? (y/n): ", 's');
+    if lower(playAgain) ~= 'y'
+        disp("Thank you for playing! Goodbye.");
+        stop(bgMusicPlayer);  % Stop background music at the end of the session
+        break;  % Exit the outer loop if the answer is not 'y'
     end
 
-    % Convert row and column to cell index
-    cell = (upper(rowInput) - 'A') * 3 + str2double(colInput);
-
-    if ~checktaken_AS(boardArr, cell)
-        % Play move sound (note: this will not stop the background music)
-        sound(moveSound, moveFs);  % Play the sound for making a move
-
-        % Place piece
-        boardArr(cell) = turn;
-        % Change turn
-        turn = mod(turn, 2) + 1;
-        clc;
-    else
-        disp("Invalid move, spot already taken. Try again.");
-    end
+    % Clear the command window and reset game state
+    clc;
 end
