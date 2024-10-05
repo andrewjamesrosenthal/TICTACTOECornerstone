@@ -77,12 +77,26 @@ pause(1)
 clc;
 
 boardArr = repelem(0, 9);
+% Load background music and start playing it in a loop
+[gMusic, gMusicFs] = audioread('gamemusic.mp3');
+[moveSound, moveFs] = audioread('move.mp3');
+[quitSound, quitFs] = audioread('quit.mp3'); % Make sure you also load the sample rate for quitSound
 
-% main game loop
+% Create an audioplayer object for the background music
+bgMusicPlayer = audioplayer(gMusic, gMusicFs);
+play(bgMusicPlayer);  % Play the background music (no need for 'async')
+
+% Main game loop
 while (true)
     [w, s, f] = Checkwin_AS(boardArr);
     Boardplot_AS(boardArr, w, s, f);
+    
     if w ~= 0
+        % Play the win sound when a winner is detected
+        [y, Fs] = audioread('wins.wav'); % Read the win audio file
+        sound(y, Fs); % Play the win sound
+        disp([names(w) ' wins the game!']);
+        stop(bgMusicPlayer);  % Stop background music when the game ends
         break
     end
 
@@ -93,6 +107,8 @@ while (true)
         rowInput = input("Enter the row (A, B, C) or 'q' to quit: ", 's');
         if lower(rowInput) == "q"
             disp("User has quit the game");
+            stop(bgMusicPlayer);
+            sound(quitSound, quitFs);  % Play the quit sound with the correct sample rate
             break;
         elseif ismember(lower(rowInput), {'a', 'b', 'c'})
             break;
@@ -110,6 +126,8 @@ while (true)
         colInput = input("Enter the column (1, 2, 3) or 'q' to quit: ", 's');
         if lower(colInput) == "q"
             disp("User has quit the game");
+            stop(bgMusicPlayer); 
+            sound(quitSound, quitFs);  % Play the quit sound with the correct sample rate
             break;
         end
 
@@ -132,6 +150,9 @@ while (true)
     cell = (upper(rowInput) - 'A') * 3 + str2double(colInput);
 
     if ~checktaken_AS(boardArr, cell)
+        % Play move sound (note: this will not stop the background music)
+        sound(moveSound, moveFs);  % Play the sound for making a move
+
         % Place piece
         boardArr(cell) = turn;
         % Change turn
