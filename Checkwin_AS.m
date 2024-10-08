@@ -18,46 +18,35 @@
 % same as the two others that are colinear with it.
 
 function [winner, start, finish] = Checkwin_AS(arr)
-    % check anything through the center  
-    if arr(5) ~= 0
-        mark = arr(5);
-        for i = 1:4
-            if arr(5-i) == mark && arr(5+i) == mark
-                winner = mark;
-                start = 5-i;
-                finish = 5+i;
-                return
-            end
-        end
-    end
-    % check top left
-    if arr(1) ~= 0
-        mark = arr(1);
-        for i = [1 3]
-            if arr(1+i) == mark && arr(1+2*i) == mark
-                winner = mark;
-                start = 1+i;
-                finish = 1+2i;
-                return
-            end
-        end
-    end
-    % check bottom right
-    if arr(9) ~= 0
-        mark = arr(9);
-        for i = [-1 -3]
-            if arr(9+i) == mark && arr(9+2*i) == mark
-                winner = mark;
-                start = 9+i;
-                finish = 9+2i;
-                return
-            end
-        end
-    end
+    % Initialize output variables
     winner = 0;
     start = 0;
     finish = 0;
+
+    % Define all possible winning combinations
+    winning_combos = [1 2 3; 4 5 6; 7 8 9; 1 4 7; 2 5 8; 3 6 9; 1 5 9; 3 5 7];
+
+    % Loop through each winning combination
+    for i = 1:size(winning_combos, 1)
+        combo = winning_combos(i, :);
+        if arr(combo(1)) ~= 0 && arr(combo(1)) == arr(combo(2)) && arr(combo(2)) == arr(combo(3))
+            winner = arr(combo(1));
+            start = combo(1);
+            finish = combo(3);
+            return;
+        end
+    end
+
+    % Check for a tie (no winner and all elements are non-zero)
+    if all(arr ~= 0)
+        winner = -1; % Use -1 to indicate a tie
+    end
 end
+
+
+
+
+
 
 
     

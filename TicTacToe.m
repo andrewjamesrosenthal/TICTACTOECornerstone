@@ -102,7 +102,7 @@ while lower(playAgain) == 'y'  % Loop to allow replaying
         [w, s, f] = Checkwin_AS(boardArr);
         Boardplot_AS(boardArr, w, s, f);
 
-        if w ~= 0
+        if w == 1 || w == 2
             % Play the win sound when a winner is detected
             [y, Fs] = audioread('wins.wav');
             sound(y, Fs);
@@ -110,6 +110,10 @@ while lower(playAgain) == 'y'  % Loop to allow replaying
             stop(bgMusicPlayer);
             break;  % Break out of the main game loop when a player wins
         end
+        if w == -1
+            disp("It is a tie");
+        end
+        
 
         disp("It is " + names(turn) + "'s turn.");
 
