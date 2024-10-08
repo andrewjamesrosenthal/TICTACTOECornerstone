@@ -80,11 +80,12 @@ boardArr = repelem(0, 9);
 % Load background music and start playing it in a loop
 [gMusic, gMusicFs] = audioread('gamemusic.mp3');
 [moveSound, moveFs] = audioread('move.mp3');
-[quitSound, quitFs] = audioread('quit.mp3'); % Make sure you also load the sample rate for quitSound
+[quitSound, quitFs] = audioread('quit.wav');
 
-playAgain = 'y';  % Initialize to allow playing at least one round
+playAgain = 'y';
 
-while lower(playAgain) == 'y'  % Loop to allow replaying
+%Allows user to play again after finisihing a game
+while lower(playAgain) == 'y' 
 
     % Main game loop initialization
     boardArr = repelem(0, 9);
@@ -97,92 +98,94 @@ while lower(playAgain) == 'y'  % Loop to allow replaying
     bgMusicPlayer = audioplayer(gMusic, gMusicFs);
     play(bgMusicPlayer);
 
-    % Main game loop
-    while (true)
-        [w, s, f] = Checkwin_AS(boardArr);
-        Boardplot_AS(boardArr, w, s, f);
+% Main game loop
+while (true)
+    [w, s, f] = Checkwin_JR(boardArr);
+    Boardplot_JR(boardArr, w, s, f);
 
-        if w == 1 || w == 2
-            % Play the win sound when a winner is detected
-            [y, Fs] = audioread('wins.wav');
-            sound(y, Fs);
-            disp(names(w) + ' wins the game!');
-            stop(bgMusicPlayer);
-            break;  % Break out of the main game loop when a player wins
-        end
-        if w == -1
-            disp("It is a tie");
-        end
-        
+    if w == 1 || w == 2
+        % Play the win sound when a winner is detected
+        [y, Fs] = audioread('wins.wav');
+        sound(y, Fs);
+        disp(names(w) + ' wins the game!');
+        stop(bgMusicPlayer);
+        break;  % Break out of the main game loop when a player wins
+    elseif w == -1
+        % Handle the tie condition
+        disp("It is a tie!");
+        stop(bgMusicPlayer);
+        break;  % Break out of the main game loop when the game ends in a tie
+    end
 
-        disp("It is " + names(turn) + "'s turn.");
+    disp("It is " + names(turn) + "'s turn.");
 
-        % Get and validate row input
-        while true
-            rowInput = input("Enter the row (A, B, C) or 'q' to quit: ", 's');
-            if lower(rowInput) == "q"
-                disp("User has quit the game");
-                stop(bgMusicPlayer);
-                sound(quitSound, quitFs);
-                break;  % Exit game loop on quit
-            elseif ismember(lower(rowInput), {'a', 'b', 'c'})
-                break;
-            else
-                disp("Invalid row input, please enter A, B, or C.");
-            end
-        end
-
+    % Get and validate row input
+    while true
+        rowInput = input("Enter the row (A, B, C) or 'q' to quit: ", 's');
         if lower(rowInput) == "q"
+            disp("User has quit the game");
+            stop(bgMusicPlayer);
+            sound(quitSound, quitFs);
+            break;  % Exit game loop on quit
+        elseif ismember(lower(rowInput), {'a', 'b', 'c'})
             break;
-        end
-
-        % Get and validate column input
-        while true
-            colInput = input("Enter the column (1, 2, 3) or 'q' to quit: ", 's');
-            if lower(colInput) == "q"
-                disp("User has quit the game");
-                stop(bgMusicPlayer);
-                sound(quitSound, quitFs);
-                break;
-            end
-
-            colNumber = str2double(colInput);
-
-            if isnan(colNumber) || ~ismember(colNumber, [1, 2, 3])
-                disp("Invalid column input, please enter 1, 2, or 3.");
-            else
-                break;
-            end
-        end
-
-        if lower(colInput) == "q"
-            break;
-        end
-
-        % Convert row and column to cell index
-        cell = (upper(rowInput) - 'A') * 3 + str2double(colInput);
-
-        if ~checktaken_AS(boardArr, cell)
-            sound(moveSound, moveFs);  % Play move sound
-            boardArr(cell) = turn;  % Place piece
-            turn = mod(turn, 2) + 1;  % Switch player
-            clc;
         else
-            disp("Invalid move, spot already taken. Try again.");
+            disp("Invalid row input, please enter A, B, or C.");
         end
     end
 
-    % After game ends (either via win or quit)
-    disp("Game over! Thanks for playing.");
-
-    % Ask if the players want to play another round
-    playAgain = input("Do you want to play another round? (y/n): ", 's');
-    if lower(playAgain) ~= 'y'
-        disp("Thank you for playing! Goodbye.");
-        stop(bgMusicPlayer);  % Stop background music at the end of the session
-        break;  % Exit the outer loop if the answer is not 'y'
+    if lower(rowInput) == "q"
+        break;
     end
 
-    % Clear the command window and reset game state
-    clc;
+    % Get and validate column input
+    while true
+        colInput = input("Enter the column (1, 2, 3) or 'q' to quit: ", 's');
+        if lower(colInput) == "q"
+            disp("User has quit the game");
+            stop(bgMusicPlayer);
+            sound(quitSound, quitFs);
+            break;
+        end
+
+        colNumber = str2double(colInput);
+
+        if isnan(colNumber) || ~ismember(colNumber, [1, 2, 3])
+            disp("Invalid column input, please enter 1, 2, or 3.");
+        else
+            break;
+        end
+    end
+
+    if lower(colInput) == "q"
+        break;
+    end
+
+    % Convert row and column to cell index
+    cell = (upper(rowInput) - 'A') * 3 + str2double(colInput);
+
+    if ~checktaken_JR(boardArr, cell)
+        sound(moveSound, moveFs);  % Play move sound
+        boardArr(cell) = turn;  % Place piece
+        turn = mod(turn, 2) + 1;  % Switch player
+        clc;
+    else
+        disp("Invalid move, spot already taken. Try again.");
+    end
 end
+
+% After game ends (either via win, tie, or quit)
+disp("Game over! Thanks for playing.");
+
+% Ask if the players want to play another round
+playAgain = input("Do you want to play another round? (y/n): ", 's');
+if lower(playAgain) ~= 'y'
+    disp("Thank you for playing! Goodbye.");
+    stop(bgMusicPlayer);  % Stop background music at the end of the session
+    return;  % Exit the script or function
+end
+end
+
+% Clear the command window and reset game state
+clc;
+% Reset the board and other game variables here if necessary

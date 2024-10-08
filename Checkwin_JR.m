@@ -17,14 +17,15 @@
 % "checking" entails checking the focal cell's mark and seeing if it is the
 % same as the two others that are colinear with it.
 
-function [winner, start, finish] = Checkwin_AS(arr)
+function [winner, start, finish] = Checkwin_JR(arr)
     % Initialize output variables
     winner = 0;
     start = 0;
     finish = 0;
 
     % Define all possible winning combinations
-    winning_combos = [1 2 3; 4 5 6; 7 8 9; 1 4 7; 2 5 8; 3 6 9; 1 5 9; 3 5 7];
+winning_combos = [1 2 3; 4 5 6; 7 8 9; 1 4 7; 2 5 8; 3 6 9; 1 5 9; 3 5 7];
+
 
     % Loop through each winning combination
     for i = 1:size(winning_combos, 1)
@@ -38,8 +39,10 @@ function [winner, start, finish] = Checkwin_AS(arr)
     end
 
     % Check for a tie (no winner and all elements are non-zero)
-    if all(arr ~= 0)
+    if winner == 0 && all(arr ~= 0)
         winner = -1; % Use -1 to indicate a tie
+        start = 0;
+        finish = 0;
     end
 end
 
