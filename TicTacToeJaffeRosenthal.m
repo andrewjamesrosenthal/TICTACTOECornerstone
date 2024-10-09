@@ -20,9 +20,21 @@
 
 
 clc; clear;
-disp("The Program was written by Andrew and Sean")
+
+% Loads the game sounds
+[samp, freq] = audioread('gamemusic.mp3');
+bgMusic = audioplayer(samp, freq);
+
+[moveSound, moveFs] = audioread('move.mp3');
+[winSound, winFs] = audioread('wins.wav');
+[quitSound, quitFs] = audioread('quit.wav');
+[sadSound, sadFs] = audioread('sad.mp3');
+[yaySound, yayFs] = audioread('yay.mp3');
+[invalidSound, invalidFs] = audioread('invalid.mp3');
 
 % welcome message
+disp("The Program was written by Andrew and Sean")
+
 disp('Welcome to')
 
 
@@ -46,46 +58,33 @@ disp('   c) Diagonally.')
 disp('5. A player cannot place their symbol in a cell that is already occupied.')
 disp('6. The game ends when a player aligns three symbols or when all cells')
 disp('   are filled and no player has won (resulting in a draw).')
-disp(' ')
 disp('7. To place your marker enter the row and column where you want to play (A1, B1, C3, etc.)')
+disp(' ')
 disp('Let''s play!')
 
 names = ["" ""];
 names(1) = input('What is player 1 name: ', 's');
 names(2) = input('What is player 2 name: ', 's');
 
-% Loads the game sounds
-[gMusic, gMusicFs] = audioread('gamemusic.mp3');
-[moveSound, moveFs] = audioread('move.mp3');
-[quitSound, quitFs] = audioread('quit.wav');
+
 
 playAgain = 'y';
 
 % Allows user to play again after finishing a game
 while lower(playAgain) == 'y' 
-    % Flip coin
-    input('Press enter to flip a coin to determine who goes first: ', 's');
-    clc;
-    pause(0.5)
-    
-    % Coin flip animation
-    coinFrames = ['-', '\', '|', '/'];
-    pauseTime = 0.2;
-    for i = 1:9
-        disp(coinFrames(mod(i-1, 4)+1));
-        pause(pauseTime);
-        clc;
-    end
-    
     boardArr = repelem(0, 9);
+    
+    % flipcoin animation
+    flipcoin_JR();
+
     turn = randi([1, 2], 1);  % Randomly decide who goes first
+    sound(yaySound, yayFs);
     fprintf('Coin was heads! %s goes first!\n', names(turn));
-    pause(1);
+    pause(1.5);
     clc;
 
     % Load and start background music
-    bgMusicPlayer = audioplayer(gMusic, gMusicFs);
-    play(bgMusicPlayer);
+    play(bgMusic);
 
     % Main game loop
     while true
@@ -93,84 +92,94 @@ while lower(playAgain) == 'y'
         Boardplot_JR(boardArr, w, s, f);
         % Checks if the game is over in a win or a tie and plays win sound if so
         if w == 1 || w == 2
-            [y, Fs] = audioread('wins.wav');
-            sound(y, Fs);
+            sound(winSound, winFs);
             disp(names(w) + ' wins the game!');
-            stop(bgMusicPlayer);
+            stop(bgMusic);
+            
             break;  
         elseif w == -1
             disp("It is a tie!");
             stop(bgMusicPlayer);
             break;
         end
-
+        
         disp("It is " + names(turn) + "'s turn.");
 
         % Quits game and plays quit sound if user enters q
         while true
-            rowInput = input("Enter the row (A, B, C) or 'q' to quit: ", 's');
-            if lower(rowInput) == "q"
+            inp = input("Enter the row and col (ex. A1) or 'q' to quit: ", 's');
+            if strlength(inp) == 2
+                % breaks apart the input
+                rowInp = lower(inp(1));
+                colInp = str2double(inp(2));
+
+                % checks if row is wrong
+                if ~ismember(rowInp, {'a', 'b', 'c'})
+                    sound(invalidSound, invalidFs);
+                    disp("Invalid row input, please enter A, B, or C.");
+                % checks if col is wrong
+                elseif isnan(colInp) || ~ismember(colInp, [1, 2, 3])
+                    sound(invalidSound, invalidFs);
+                    disp("Invalid column input, please enter 1, 2, or 3.");
+                % row and col are at least on board
+                else
+                    % Convert row and column to cell index
+                    cell = (rowInp - 'a') * 3 + colInp;
+            
+                    % check if cell already taken
+                    if checktaken_JR(boardArr, cell)
+                        sound(invalidSound, invalidFs);
+                        disp("Invalid move, spot already taken. Try again.");
+                    % move is valid
+                    else
+                        % complete move
+                        sound(moveSound, moveFs);
+                        boardArr(cell) = turn; 
+                        turn = mod(turn, 2) + 1;
+                        clc;
+                        break;
+                    end
+                end
+            % if quit flag
+            elseif lower(inp) == "q"
                 disp("User has quit the game");
-                stop(bgMusicPlayer);
+                stop(bgMusic);
                 sound(quitSound, quitFs);
                 break;  % Exit game loop on quit
-            elseif ismember(lower(rowInput), {'a', 'b', 'c'})
-                break;
+            % input is just completely wrong
             else
-                disp("Invalid row input, please enter A, B, or C.");
+                sound(invalidSound, invalidFs);
+                disp("Invalid input length. Please enter 2 character, a row and col pair.");
             end
         end
 
-        if lower(rowInput) == "q"
+        % checks if result quit again (exits out of game loop this time)
+        if lower(inp) == "q"
             break;
-        end
-
-        % Get and validate column input
-        while true
-            colInput = input("Enter the column (1, 2, 3) or 'q' to quit: ", 's');
-            if lower(colInput) == "q"
-                disp("User has quit the game");
-                stop(bgMusicPlayer);
-                sound(quitSound, quitFs);
-                break;
-            end
-
-            colNumber = str2double(colInput);
-
-            if isnan(colNumber) || ~ismember(colNumber, [1, 2, 3])
-                disp("Invalid column input, please enter 1, 2, or 3.");
-            else
-                break;
-            end
-        end
-
-        if lower(colInput) == "q"
-            break;
-        end
-
-        % Convert row and column to cell index
-        cell = (upper(rowInput) - 'A') * 3 + str2double(colInput);
-
-        % Moves
-        if ~checktaken_JR(boardArr, cell)
-            sound(moveSound, moveFs);
-            boardArr(cell) = turn; 
-            turn = mod(turn, 2) + 1;
-            clc;
-        else
-            disp("Invalid move, spot already taken. Try again.");
         end
     end
-
+    
+    stop(bgMusic);
     disp("Game over! Thanks for playing.");
 
     % Ask if the players want to play another round
     playAgain = input("Do you want to play another round? (y/n): ", 's');
-    % Ends game and stops music if not y
-    if lower(playAgain) ~= 'y'
-        disp("Thank you for playing! Goodbye.");
-        stop(bgMusicPlayer); 
-        return;  
+
+    % loop to ensure readable answer
+    while true
+        % Ends game and stops music if not y
+        if lower(playAgain) == 'y'
+            sound(yaySound, yayFs);
+            clc;
+        elseif lower(playAgain) == 'n'
+            sound(sadSound, sadFs);
+            disp("Awww, goodbye then :(");
+            pause(1);
+            disp("Play again when you can!")
+            return;  
+        else
+            fprintf("I don't know what '%s' means, but you meant yes right? (y/n): ", playAgain);
+            playAgain = input("", "s");
+        end
     end
-    clc;
 end
