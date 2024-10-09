@@ -1,5 +1,5 @@
 % Andrew and Sean 9/29/24
-%Tic Tac Toe
+% Tic Tac Toe
 % Pseudocode for Tic-Tac-Toe Game
 % This script runs a command-line Tic-Tac-Toe game.
 % Clears console, displays a welcome message, and the game rules.
@@ -18,13 +18,11 @@
 % After each round, prompts players if they want to play again.
 % Ends the game if players choose not to continue.
 
-
 clc; clear;
 disp("The Program was written by Andrew and Sean")
 
 % welcome message
 disp('Welcome to')
-
 
 disp('████████╗██╗ ██████╗    ████████╗ █████╗  ██████╗     ████████╗ ██████╗  ███████╗')
 disp('╚══██╔══╝██║██╔════╝       ██╔══╝██╔══██╗██╔════╝     ╚══██╔══╝██╔═══██╗ ██╔════╝')
@@ -126,8 +124,11 @@ while lower(playAgain) == 'y'
         end
 
         % Get and validate column input
+        % Loop until valid input or user quits
         while true
             colInput = input("Enter the column (1, 2, 3) or 'q' to quit: ", 's');
+            
+            % Quit if input is 'q'
             if lower(colInput) == "q"
                 disp("User has quit the game");
                 stop(bgMusicPlayer);
@@ -135,8 +136,10 @@ while lower(playAgain) == 'y'
                 break;
             end
 
+            % Convert input to a number
             colNumber = str2double(colInput);
 
+            % Check for invalid input
             if isnan(colNumber) || ~ismember(colNumber, [1, 2, 3])
                 disp("Invalid column input, please enter 1, 2, or 3.");
             else
@@ -144,6 +147,7 @@ while lower(playAgain) == 'y'
             end
         end
 
+        % Exit if user chose 'q'
         if lower(colInput) == "q"
             break;
         end
