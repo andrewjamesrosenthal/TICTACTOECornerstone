@@ -1,5 +1,5 @@
 % Andrew and Sean 9/29/24
-%Tic Tac Toe
+% Tic Tac Toe
 % Pseudocode for Tic-Tac-Toe Game
 % This script runs a command-line Tic-Tac-Toe game.
 % Clears console, displays a welcome message, and the game rules.
@@ -18,7 +18,6 @@
 % After each round, prompts players if they want to play again.
 % Ends the game if players choose not to continue.
 
-
 clc; clear;
 
 % Loads the game sounds
@@ -36,7 +35,6 @@ bgMusic = audioplayer(samp, freq);
 disp("The Program was written by Andrew and Sean")
 
 disp('Welcome to')
-
 
 disp('████████╗██╗ ██████╗    ████████╗ █████╗  ██████╗     ████████╗ ██████╗  ███████╗')
 disp('╚══██╔══╝██║██╔════╝       ██╔══╝██╔══██╗██╔════╝     ╚══██╔══╝██╔═══██╗ ██╔════╝')
