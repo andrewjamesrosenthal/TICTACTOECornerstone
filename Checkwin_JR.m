@@ -1,23 +1,22 @@
 % Andrew and Sean 10/1/24
-
-% pseudo code
-% 3 main cases:
-
-% 1.)
-% starting at the center check if cells in opposite directions of each
-% other are all the same values as the center 
-% these lines: \ | / -
-
-% 2.)
-% check top left corner and check the horizontal and vertical line
-
-% 3.)
-% check the bottom right and check the horizontal and vertical line
-
-% "checking" entails checking the focal cell's mark and seeing if it is the
-% same as the two others that are colinear with it.
-
 function [winner, start, finish] = Checkwin_JR(arr)
+% Inputs:
+%   arr - A 1x9 array representing the tic-tac-toe board.
+% Outputs:
+%   winner - The player number 1 or 2 depending on the winner -1 if it is 
+%            a Tie and 0 if there is no winner
+%   start  - The index of the first position in the winning combination.
+%            Returns 0 if there is no winner or a tie.
+%   finish - The index of the last position in the winning combination.
+%            Returns 0 if there is no winner or a tie.
+%
+% Description:
+%   Checks to see if there is a winner in the game, looks at all of the
+%   possible winning combos and if they are all 1s or 2s there is a winner
+%   it then checks to see if there is no winner and if all of the elements
+%   are non zero which means it is a tie
+
+
     % Initialize output variables
     winner = 0;
     start = 0;

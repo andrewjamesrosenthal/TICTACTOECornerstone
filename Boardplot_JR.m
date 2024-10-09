@@ -1,37 +1,22 @@
 % Andrew and Sean 10/1/24
-
-% pseudo code:
-% function inputs: arr & winner (x or o) & start + finish of 3 in a row
-% 
-% Define style variables
-% weight, gridColor, xColor, oColor, winTextColor, POC
-% 
-% Board dimensions variables
-% lef, top, spacing
-% 
-% Configure viewport
-% axis to square with defined limits
-% 
-% Draw horizontal and vertical lines for the grid
-% 
-% Label rows and columns with ABC and 123
-% 
-% Draw 'X' and 'O' based on arr values
-% FOR each cell in arr DO
-%     CALCULATE cell center (X, Y)
-%     IF arr[i] == 1 THEN
-%         DRAW 'X' at (X, Y)
-%     ELSE IF arr[i] == 2 THEN
-%         DRAW 'O' at (X, Y)
-% 
-% Check for winner
-% IF winner != 0 THEN
-%     Change the statement and connector color based on winner
-%     Draw winning line and display message
-
-
-
 function [] = Boardplot_JR (arr, winner, start, finish)
+% Inputs:
+%   arr    - A 1x9 array representing the tic-tac-toe board. Each element
+%            corresponds to a cell on the board and can be:
+%            0 (empty), 1 (player 1's move, 'X'), or 2 (player 2's move, 'O').
+%   winner - The player number 1 or 2 depending on the winner -1 if it is 
+%            a Tie and 0 if there is no winner
+%   start  - The index of the first position in the winning combination.
+%            Returns 0 if there is no winner or a tie.
+%   finish - The index of the last position in the winning combination.
+%            Returns 0 if there is no winner or a tie.
+% Description:
+%   This function displays the tic tac toe board based on the input array
+%   arr. It draws the board grid with X and O in the locations where they
+%   are placed and draws a line through the winning pieces along with the
+%   message of who wins it also displays if there is no winner at the end
+%   it displays that it is a tie.
+
     clf;
     hold on
 
@@ -70,9 +55,8 @@ function [] = Boardplot_JR (arr, winner, start, finish)
         text(lef - spacing / 4, top - spacing * (i - 0.5), rowValues(i), 'Color', gridColor, 'FontSize', 20);
     end
 
-    % Loop through all cells of the mark array
+    % Loop through all cells of the array
     for i = 1:size(arr, 2)
-        % Getting center coordinates of the current cell
         X = lef + spacing * (0.5 + mod(i - 1, 3));
         Y = top - spacing * (0.5 + floor((i - 1) / 3));
         % Check if it's an 'X'
@@ -87,17 +71,19 @@ function [] = Boardplot_JR (arr, winner, start, finish)
         end
     end
 
-    % Win screen
+% Win screen
     if winner ~= 0
-        % Customize output based on who won
+        % Text depending on outcome of the game
         if winner == 1
             statement = 'X Wins!';
             conColor = xColor;
-        else
+        elseif winner == 2
             statement = 'O Wins!';
             conColor = oColor;
+        else
+            statement = 'Tie!';
+            conColor = oColor;
         end
-
         % Convert start and finish cells to row and column indices
         srow = floor((start - 1) / 3);
         scol = mod(start - 1, 3);
