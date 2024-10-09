@@ -1,5 +1,8 @@
 % Sean and Andrew 10/8/24
 function [] = flipcoin_JR()
+% Description:
+%   Displays animation for flipping a coin that shows the face of a coin
+%   after landing
     
 
     %load soundeffect

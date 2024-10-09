@@ -77,9 +77,15 @@ while lower(playAgain) == 'y'
 
     turn = randi([1, 2], 1);  % Randomly decide who goes first
     sound(yaySound, yayFs);
-    fprintf('Coin was heads! %s goes first!\n', names(turn));
+    if turn == 1
+        fprintf('Coin was heads! %s goes first!\n', names(turn));
+    else
+        fprintf('Coin was tails! %s goes first!\n', names(turn));
+    end  % Added 'end' here to close the if-else block
+
     pause(1.5);
     clc;
+
 
     % Load and start background music
     play(bgMusic);
@@ -93,13 +99,13 @@ while lower(playAgain) == 'y'
             sound(winSound, winFs);
             disp(names(w) + ' wins the game!');
             stop(bgMusic);
-            
             break;  
         elseif w == -1
             disp("It is a tie!");
-            stop(bgMusicPlayer);
+            stop(bgMusic);  % Removed the incorrect 'bgMusicPlayer' variable
             break;
         end
+
         
         disp("It is " + names(turn) + "'s turn.");
 
@@ -169,6 +175,7 @@ while lower(playAgain) == 'y'
         if lower(playAgain) == 'y'
             sound(yaySound, yayFs);
             clc;
+            break
         elseif lower(playAgain) == 'n'
             sound(sadSound, sadFs);
             disp("Awww, goodbye then :(");
